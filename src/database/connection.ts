@@ -3,6 +3,7 @@ import { Dialect } from "sequelize";
 dotenv.config();
 
 import { Sequelize } from "sequelize-typescript";
+import { User } from "./model/user-model";
 
 const dialect: Dialect = (process.env.DB_DIALECT as Dialect) || "mysql";
 
@@ -15,6 +16,7 @@ const sequelize = new Sequelize({
   host: process.env.DB_HOST || "localhost",
   port: Number(process.env.DB_PORT) || 3306,
   dialect,
+  models:[User]
 
 })
 

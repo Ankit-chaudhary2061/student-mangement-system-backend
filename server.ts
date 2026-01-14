@@ -3,6 +3,7 @@
 import dotenv from "dotenv";
 import app from "./src/app";
 import sequelize from "./src/database/connection";
+import { adminSeeder } from "./src/admin-seeder";
 dotenv.config();
 
 
@@ -18,7 +19,8 @@ try {
 
     await sequelize.sync({ force: false });
     console.log("DB synced ✔");
-
+ await adminSeeder();
+    console.log("Admin seeder finished ✔");
 
       const port = process.env.PORT || 9000;
     app.listen(port, () => {
