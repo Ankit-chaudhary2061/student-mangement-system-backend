@@ -2,6 +2,7 @@
 
 import dotenv from "dotenv";
 import app from "./src/app";
+import sequelize from "./src/database/connection";
 dotenv.config();
 
 
@@ -10,12 +11,24 @@ dotenv.config();
 
 const startServer = async () => {
 
+try {
+   await sequelize.authenticate();
+   console.log("Database authenticated successfully!");
 
 
-    const port = process.env.PORT || 9000;
+    await sequelize.sync({ force: false });
+    console.log("DB synced ✔");
+
+
+      const port = process.env.PORT || 9000;
     app.listen(port, () => {
       console.log(`Server running on port ${port}`);
     });
+} catch (error) {
+    
+}
+
+  
 
   
 
