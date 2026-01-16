@@ -17,7 +17,7 @@ try {
    console.log("Database authenticated successfully!");
 
 
-    await sequelize.sync({ force: false });
+    await sequelize.sync({ force:false});
     console.log("DB synced ✔");
  await adminSeeder();
     console.log("Admin seeder finished ✔");

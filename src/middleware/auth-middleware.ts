@@ -44,7 +44,12 @@ class AuthMiddleware {
       }
 
  
-      req.user = user
+      req.user =   req.user = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    };
 
       next();
     } catch (error) {
