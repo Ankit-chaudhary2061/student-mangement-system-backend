@@ -55,7 +55,7 @@ class TeacherController {
         role: UserRole.TEACHER,
       });
       // create teacher
- const imageUrl = req.file ? req.file.path : null; // multer saves file info in req.file
+ const imageUrl = req.file ? req.file.path : null; 
 
 const teacher = await Teacher.create({
   userId,
@@ -66,7 +66,7 @@ const teacher = await Teacher.create({
   teacherExpertise: teacherExpertise as TeacherExpertise,
   teacherPhoneNumber,
   courseId,
-  teacherPhoto:imageUrl, // now it’s included
+  teacherPhoto:imageUrl,
 });
 
        await sendTeacherMail(teacherEmail, tempPassword);
