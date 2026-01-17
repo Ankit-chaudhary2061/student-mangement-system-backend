@@ -55,25 +55,33 @@ class TeacherController {
         role: UserRole.TEACHER,
       });
       // create teacher
-      const teacher = await Teacher.create({
-        userId,
-        teacherName: teacherName,
-        teacherEmail: teacherEmail,
-        teacherAddress: teacherAddress,
-        teacherExperience: teacherExperience,
-        teacherExpertise: teacherExpertise as TeacherExpertise,
-        teacherPhoneNumber: teacherPhoneNumber,
-        courseId,
-      });
+ const imageUrl = req.file ? req.file.path : null; // multer saves file info in req.file
+
+const teacher = await Teacher.create({
+  userId,
+  teacherName,
+  teacherEmail,
+  teacherAddress,
+  teacherExperience,
+  teacherExpertise: teacherExpertise as TeacherExpertise,
+  teacherPhoneNumber,
+  courseId,
+  teacherPhoto:imageUrl, // now it’s included
+});
+
        await sendTeacherMail(teacherEmail, tempPassword);
       return res.status(201).json({
         message: "teacher added successfully",
         teacher,
       });
-    } catch (error) {
+    } catch (error :any) {
       console.error(error);
       return res.status(500).json({
         message: "something went wrong",
+      error: error.message,
+        fullError: error, 
+        stack: error.stack
+
       });
     }
   }

@@ -9,7 +9,7 @@ const router = express.Router();
  * Admin & Teacher
  */
 router.post(
-  "/courses",
+  "/course",
   AuthMiddleware.isLogedIn,
   AuthMiddleware.restrictTo(UserRole.ADMIN, UserRole.TEACHER),
   CourseController.addCourse
