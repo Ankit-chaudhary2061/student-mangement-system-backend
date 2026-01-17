@@ -30,7 +30,7 @@ export class User extends Model<UserCreate> {
   @Column({ allowNull: false })
   declare username: string;
 
-  @Column({ allowNull: false, unique: true })
+  @Column({ allowNull: false, unique: false })
   declare email: string;
 
   @Column({ allowNull: false })
