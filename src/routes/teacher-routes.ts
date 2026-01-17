@@ -20,4 +20,28 @@ router.post(
   TeacherController.addTeacher
 );
 
+// Get all teachers
+router.get(
+  "/teachers",
+  AuthMiddleware.isLogedIn,
+  AuthMiddleware.restrictTo(UserRole.ADMIN),
+  TeacherController.getAllTeacher
+);
+
+// Get a single teacher by ID
+router.get(
+  "/teacher/:id",
+  AuthMiddleware.isLogedIn,
+  AuthMiddleware.restrictTo(UserRole.ADMIN),
+  TeacherController.getSingleTeacher
+);
+
+// Delete a teacher by ID
+router.delete(
+  "/teacher/:id",
+  AuthMiddleware.isLogedIn,
+  AuthMiddleware.restrictTo(UserRole.ADMIN),
+  TeacherController.deleteTeacher
+);
+
 export default router;

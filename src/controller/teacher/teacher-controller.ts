@@ -4,6 +4,8 @@ import { IAuthRequest, UserRole } from "../../middleware/auth-middleware";
 import bcrypt from 'bcrypt'
 import { User } from "../../database/model/user-model";
 import { sendTeacherMail } from "../../service/node-mailer";
+import { Model } from "sequelize";
+import Course from "../../database/model/course-model";
 
 class TeacherController {
   static async addTeacher(req: IAuthRequest, res: Response) {
@@ -55,33 +57,130 @@ class TeacherController {
         role: UserRole.TEACHER,
       });
       // create teacher
- const imageUrl = req.file ? req.file.path : null; 
-
-const teacher = await Teacher.create({
-  userId,
-  teacherName,
-  teacherEmail,
-  teacherAddress,
-  teacherExperience,
-  teacherExpertise: teacherExpertise as TeacherExpertise,
-  teacherPhoneNumber,
-  courseId,
-  teacherPhoto:imageUrl,
-});
-
+      const teacher = await Teacher.create({
+        userId,
+        teacherName: teacherName,
+        teacherEmail: teacherEmail,
+        teacherAddress: teacherAddress,
+        teacherExperience: teacherExperience,
+        teacherExpertise: teacherExpertise as TeacherExpertise,
+        teacherPhoneNumber: teacherPhoneNumber,
+        courseId,
+      });
        await sendTeacherMail(teacherEmail, tempPassword);
       return res.status(201).json({
         message: "teacher added successfully",
         teacher,
       });
-    } catch (error :any) {
-      console.error(error);
+    } catch (error: any) {
+      console.error("Get All Teachers Error:", error);
       return res.status(500).json({
-        message: "something went wrong",
-      error: error.message,
-        fullError: error, 
-        stack: error.stack
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }
+  static async getAllTeacher(req:IAuthRequest, res:Response){
+    try {
+      const teachers  = await Teacher.findAll({
+        include:[
+            {
+          model: User,
+          attributes: ["id", "username"],
+        },
+        {
+          model: Course,
+          attributes: ["id", "courseName"], 
+        },
+        ]
+      })
 
+   return res.status(200).json({
+        success: true,
+        message: "All teachers fetched successfully",
+        data: teachers,
+      });
+    } catch (error: any) {
+      console.error("Get All Teachers Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }
+  // Get single teacher
+  static async getSingleTeacher(req: IAuthRequest, res: Response) {
+    try {
+      const { id } = req.params;
+    const teacherId = Array.isArray(id) ? id[0] : id;
+
+      const teacher = await Teacher.findByPk(teacherId, {
+        include: [
+          {
+            model: User,
+            attributes: ["id", "username", "email", "role"],
+          },
+          {
+            model: Course,
+            attributes: ["id", "courseName"],
+          },
+        ],
+      });
+
+      if (!teacher) {
+        return res.status(404).json({
+          success: false,
+          message: "Teacher not found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Teacher fetched successfully",
+        data: teacher,
+      });
+    } catch (error: any) {
+      console.error("Get Single Teacher Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      });
+    }
+  }
+
+static async deleteTeacher(req: IAuthRequest, res: Response) {
+    try {
+      const { id } = req.params;
+    const teacherId = Array.isArray(id) ? id[0] : id;
+
+
+      const teacher = await Teacher.findByPk(teacherId);
+      if (!teacher) {
+        return res.status(404).json({
+          success: false,
+          message: "Teacher not found",
+        });
+      }
+
+      // Delete teacher record
+      await teacher.destroy();
+
+      // Also delete associated user login
+      await User.destroy({ where: { email: teacher.teacherEmail } });
+
+      return res.status(200).json({
+        success: true,
+        message: "Teacher deleted successfully",
+      });
+    } catch (error: any) {
+      console.error("Delete Teacher Error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+        error: error.message,
       });
     }
   }
